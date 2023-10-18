@@ -27,8 +27,9 @@ jobs:
           work_path=$(pwd)
       - name: update package
         run: |
-          sudo apt update -y
-          sudo apt full-upgrade -y
+          echo skipped
+          # sudo apt update -y
+          # sudo apt full-upgrade -y
       - name: install requirement
         run: |
           sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
