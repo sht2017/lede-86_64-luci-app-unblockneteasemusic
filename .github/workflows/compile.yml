@@ -17,52 +17,49 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: prepare
+      - name: update package
         run: |
-          mkdir ~/workpath
-          pwd
-          pwd
-          pwd
-          
-      # - name: update package
-      #   run: |
-      #     echo skipped
-      #     sudo apt update -y
-      #     # sudo apt full-upgrade -y
-      # - name: install requirement
-      #   run: |
-      #     sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
-      #     bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
-      #     git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
-      #     libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \
-      #     mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools \
-      #     libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip \
-      #     vim wget xmlto xxd zlib1g-dev python3-setuptools jq
-      # - name: fetch source code
-      #   run: |
-      #     git clone https://github.com/coolsnowwolf/lede
-      #     cd lede
-      #     cd package
-      #     git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git
-      #     cd ..
-      #     ./scripts/feeds update -a
-      #     ./scripts/feeds install -a
-      # - name: get toolchain
-      #   run: |
-      #     version=$(curl -s "https://api.github.com/repos/openwrt/openwrt/tags" | jq -r '.[0] | .name' | tr -d v)
-      #     url=https://downloads.openwrt.org/releases/${version}/targets/x86/64/
-      #     sdk_url=${url}$(curl -s ${url} | grep sdk | sed -n 's/.*href="\([^"]*\)".*/\1/p; q')
-      #     curl -C - --retry 5 -o /tmp/openwrt_sdk.xz ${sdk_url}
-      #     curl -C - --retry 5 -o /tmp/openwrt_sdk.xz https://raw.githubusercontent.com/sht2017/lede-86_64-luci-app-unblockneteasemusic/main/main.config
-      #     mkdir ${work_path}/sdk
-      #     tar -Jxvf /tmp/openwrt_sdk.xz --strip-components=1 -C ${work_path}/sdk */staging_dir/
-      # - name: configure
-      #   run: |
-      #     make menuconfig
-      # - name: compile
-      #   run: |
-      #     make package/luci-app-unblockneteasemusic/compile V=s 
+          sudo apt update -y
+          # sudo apt full-upgrade -y
+      - name: install requirement
+        run: |
+          sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+          bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
+          git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
+          libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \
+          mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools \
+          libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip \
+          vim wget xmlto xxd zlib1g-dev python3-setuptools jq
+      - name: fetch source code
+        run: |
+          working_path=$(pwd)
+          git clone https://github.com/coolsnowwolf/lede
+          cd lede
+          cd package
+          git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git
+          cd ..
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+      - name: get toolchain
+        run: |
+          working_path=$(pwd)
+          version=$(curl -s "https://api.github.com/repos/openwrt/openwrt/tags" | jq -r '.[0] | .name' | tr -d v)
+          url=https://downloads.openwrt.org/releases/${version}/targets/x86/64/
+          sdk_url=${url}$(curl -s ${url} | grep sdk | sed -n 's/.*href="\([^"]*\)".*/\1/p; q')
+          curl -C - --retry 5 -o /tmp/openwrt_sdk.xz ${sdk_url}
+          mkdir ${working_path}/sdk
+          tar -Jxvf /tmp/openwrt_sdk.xz --strip-components=1 -C ${working_path}/sdk */staging_dir/
+          make download -j8
+          make V=s -j1
+      - name: configure
+        run: |
+          working_path=$(pwd)
+          curl -C - --retry 5 -o ${working_path}/lede/.config https://raw.githubusercontent.com/sht2017/lede-86_64-luci-app-unblockneteasemusic/main/main.config
+      - name: compile
+        run: |
+          make download -j8
+          make V=s -j1
+      
     
