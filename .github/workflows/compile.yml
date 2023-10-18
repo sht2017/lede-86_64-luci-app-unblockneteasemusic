@@ -28,7 +28,7 @@ jobs:
       - name: update package
         run: |
           echo skipped
-          # sudo apt update -y
+          sudo apt update -y
           # sudo apt full-upgrade -y
       - name: install requirement
         run: |
