@@ -50,6 +50,7 @@ jobs:
           ./scripts/feeds install -a
       - name: get toolchain
         run: |
+          whoami
           version=$(curl -s "https://api.github.com/repos/openwrt/openwrt/tags" | jq -r '.[0] | .name' | tr -d v)
           url=https://downloads.openwrt.org/releases/${version}/targets/x86/64/
           sdk_url=${url}$(curl -s ${url} | grep sdk | sed -n 's/.*href="\([^"]*\)".*/\1/p; q')
