@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # On schedule
+  schedule:
+    - cron: "0 2 * * *"
+    
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+     - name: update package
+       run: |
+         sudo apt update -y
+         sudo apt full-upgrade -y
+     - name: install requirement
+       run: |
+         sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+         bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
+         git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
+         libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \
+         mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools \
+         libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip \
+         vim wget xmlto xxd zlib1g-dev python3-setuptools
+     - name: fetch source code
+       run: |
+         git clone https://github.com/coolsnowwolf/lede
+         cd lede
+         cd package
+         git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git
+         cd ..
+         ./scripts/feeds update -a
+         ./scripts/feeds install -a
+     - name: configure
+       run: |
+         make menuconfig
+     # - name: compile
+     #   run: |
+     #     make package/luci-app-unblockneteasemusic/compile V=s 
+    
