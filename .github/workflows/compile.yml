@@ -23,8 +23,7 @@ jobs:
       - name: prepare
         run: |
           mkdir ~/workpath
-          cd ~/workpath
-          work_path=$(pwd)
+          
       - name: update package
         run: |
           echo skipped
@@ -50,19 +49,13 @@ jobs:
           ./scripts/feeds install -a
       - name: get toolchain
         run: |
-          whoami
+          work_path=$(~/workpath)
           version=$(curl -s "https://api.github.com/repos/openwrt/openwrt/tags" | jq -r '.[0] | .name' | tr -d v)
-          whoami
           url=https://downloads.openwrt.org/releases/${version}/targets/x86/64/
-          whoami
           sdk_url=${url}$(curl -s ${url} | grep sdk | sed -n 's/.*href="\([^"]*\)".*/\1/p; q')
-          whoami
           curl -C - --retry 5 -o /tmp/openwrt_sdk.xz ${sdk_url}
-          whoami
           mkdir ${work_path}/sdk
-          whoami
           tar -Jxvf /tmp/openwrt_sdk.xz --strip-components=1 -C ${work_path}/sdk */staging_dir/
-          whoami
       # - name: configure
       #   run: |
       #     make menuconfig
