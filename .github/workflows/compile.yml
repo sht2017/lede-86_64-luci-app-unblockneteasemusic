@@ -50,9 +50,7 @@ jobs:
           sdk_url=${url}$(curl -s ${url} | grep sdk | sed -n 's/.*href="\([^"]*\)".*/\1/p; q')
           curl -C - --retry 5 -o /tmp/openwrt_sdk.xz ${sdk_url}
           mkdir ${working_path}/sdk
-          tar -Jxvf /tmp/openwrt_sdk.xz --strip-components=1 -C ${working_path}/sdk */staging_dir/
-          make download -j8
-          make V=s -j1
+          tar -Jxvf /tmp/openwrt_sdk.xz --strip-components=1 -C ${working_path}/sdk --wildcards */staging_dir/
       - name: configure
         run: |
           working_path=$(pwd)
