@@ -36,18 +36,28 @@ jobs:
         run: |
           working_path=$(pwd)
           git clone https://github.com/coolsnowwolf/lede
-      - name: fetch package source code
-        run: |
-          working_path=$(pwd)
-          cd ${working_path}/lede
-          cd package
-          git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git
-      - name: update lede 
-        run: |
-          working_path=$(pwd)
           cd ${working_path}/lede
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+      - name: fetch package source code
+        run: |
+          working_path=$(pwd)
+          cd ${working_path}/lede/package
+          git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git
+      - name: configure
+        run: |
+          working_path=$(pwd)
+          curl -C - --retry 5 -o ${working_path}/lede/.config https://raw.githubusercontent.com/sht2017/lede-86_64-luci-app-unblockneteasemusic/main/main.config
+          yes "" | make oldconfig
+      - name: patch config
+        run: |
+          sed -i 's/# CONFIG_PACKAGE_node is not set/CONFIG_PACKAGE_node=y/g' .config
+          sed -i 's/CONFIG_NODEJS_16=y/# CONFIG_NODEJS_16 is not set/g' .config
+          sed -i 's/# CONFIG_NODEJS_18 is not set/CONFIG_NODEJS_18=y\n# CONFIG_NODEJS_ICU_NONE is not set\n# CONFIG_NODEJS_ICU_SMALL is not set\nCONFIG_NODEJS_ICU_SYSTEM=y/g' .config
+          sed -i 's/# CONFIG_PACKAGE_icu is not set/CONFIG_PACKAGE_icu=y/g' .config
+          sed -i 's/# CONFIG_PACKAGE_icu-full-data is not set/CONFIG_PACKAGE_icu-full-data=y/g' .config
+          sed -i 's/# CONFIG_PACKAGE_libcares is not set/CONFIG_PACKAGE_libcares=y/g' .config
+          sed -i 's/# CONFIG_PACKAGE_luci-app-unblockneteasemusic is not set/CONFIG_PACKAGE_luci-app-unblockneteasemusic=y/g' .config
       - name: get toolchain
         run: |
           working_path=$(pwd)
@@ -57,11 +67,9 @@ jobs:
           curl -C - --retry 5 -o /tmp/openwrt_sdk.xz ${sdk_url}
           mkdir ${working_path}/sdk
           tar -Jxvf /tmp/openwrt_sdk.xz --strip-components=1 -C ${working_path}/sdk --wildcards */staging_dir/
-      - name: configure
-        run: |
-          working_path=$(pwd)
-          curl -C - --retry 5 -o ${working_path}/lede/.config https://raw.githubusercontent.com/sht2017/lede-86_64-luci-app-unblockneteasemusic/main/main.config
-          make oldconfig
+          toolchain=$(ls ${working_path}/lede/staging_dir | grep toolchain)
+          rm -rf ${working_path}/lede/staging_dir/${toolchain}
+          ln -s ${working_path}/sdk/staging_dir/$(ls ${working_path}/sdk/staging_dir/ | grep toolchain) ${working_path}/lede/staging_dir/${toolchain}
       - name: compile
         run: |
           working_path=$(pwd)
