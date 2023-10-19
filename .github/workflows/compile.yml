@@ -52,6 +52,7 @@ jobs:
         run: |
           working_path=$(pwd)
           curl -C - --retry 5 -o ${working_path}/lede/.config https://raw.githubusercontent.com/sht2017/lede-86_64-luci-app-unblockneteasemusic/main/main.config
+          make oldconfig
       - name: compile
         run: |
           working_path=$(pwd)
