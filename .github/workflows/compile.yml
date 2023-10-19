@@ -32,11 +32,20 @@ jobs:
           mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools \
           libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip \
           vim wget xmlto xxd zlib1g-dev python3-setuptools jq
-      - name: fetch source code
+      - name: fetch lede source code
         run: |
           working_path=$(pwd)
           git clone https://github.com/coolsnowwolf/lede
-          cd lede
+      - name: fetch package source code
+        run: |
+          working_path=$(pwd)
+          cd ${working_path}/lede
+          cd package
+          git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git
+      - name: update lede 
+        run: |
+          working_path=$(pwd)
+          cd ${working_path}/lede
           ./scripts/feeds update -a
           ./scripts/feeds install -a
       - name: get toolchain
