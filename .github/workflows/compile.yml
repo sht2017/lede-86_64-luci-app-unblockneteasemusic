@@ -37,9 +37,6 @@ jobs:
           working_path=$(pwd)
           git clone https://github.com/coolsnowwolf/lede
           cd lede
-          cd package
-          git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git
-          cd ..
           ./scripts/feeds update -a
           ./scripts/feeds install -a
       - name: get toolchain
